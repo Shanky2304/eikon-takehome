@@ -58,11 +58,10 @@ def etl():
 
         # Transform the data
         user_experiments_df['experiment_compound_ids'] = user_experiments_df['experiment_compound_ids'].str.split(';')
-        user_experiments_df['experiment_count'] = user_experiments_df['experiment_compound_ids'].apply(len)
-
+        total_exp_per_user = user_experiments_df.groupby('user_id')['experiment_id'].count()
         res_df = users_df[['user_id','name']].copy()
-        res_df['experiment_count'] = user_experiments_df['experiment_count']
-
+        res_df['experiment_count'] = total_exp_per_user.values
+        
         user_experiments_df['experiment_run_time'] = user_experiments_df['experiment_run_time'].astype(int)
         average_experiment_runtime = user_experiments_df.groupby('user_id')['experiment_run_time'].mean()
         most_frequent_compound_ids = user_experiments_df.groupby('user_id')['experiment_compound_ids'].apply(lambda x: Counter([item for sublist in x for item in sublist]).most_common(1)[0][0])
